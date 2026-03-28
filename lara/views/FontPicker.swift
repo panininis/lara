@@ -8,11 +8,9 @@
 import SwiftUI
 import CoreText
 import UIKit
-import UniformTypeIdentifiers
 
 struct FontPicker: View {
     @ObservedObject var mgr: laramgr
-    @State private var showfontimporter: Bool = false
 
     private func applyfont(_ resource: String, label: String) {
         let success = mgr.kfsoverwrite(target: laramgr.fontpath, withBundledFont: resource)
@@ -93,36 +91,11 @@ struct FontPicker: View {
                             .font(viewfont(resource: "segoeui", size: 17))
                     }
 
-                    Button("Custom Font (TTF)") {
-                        showfontimporter = true
-                    }
                 } header: {
                     Text("Fonts")
                 }
             }
             .navigationTitle("Font Overwrite")
-            .fileImporter(isPresented: $showfontimporter, allowedContentTypes: [UTType(filenameExtension: "ttf")!]) { result in
-                do {
-                    let url = try result.get()
-                    let didAccess = url.startAccessingSecurityScopedResource()
-                    defer {
-                        if didAccess {
-                            url.stopAccessingSecurityScopedResource()
-                        }
-                    }
-                    let tmp = NSTemporaryDirectory() + "custom_font_\(UUID().uuidString).ttf"
-                    try FileManager.default.copyItem(at: url, to: URL(fileURLWithPath: tmp))
-                    let success = laramgr.shared.kfsoverwriteWithPatchedCustomFont(target: laramgr.fontpath, customFontPath: tmp)
-                    try? FileManager.default.removeItem(atPath: tmp)
-                    if success {
-                        laramgr.shared.logmsg("font changed to custom font: \(url.lastPathComponent)")
-                    } else {
-                        laramgr.shared.logmsg("failed to change font to custom font")
-                    }
-                } catch {
-                    laramgr.shared.logmsg("custom font import failed: \(error)")
-                }
-            }
         }
     }
 }
