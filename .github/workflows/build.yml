@@ -39,18 +39,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "authed"
 
-      - name: handle archival shit
+      - name: handle archival
         id: handle_release
         run: |
           LATEST=$(gh release list --limit 1 --json tagName,createdAt | jq -r '.[0].tagName')
-          echo "latest release: $LATEST"
-
           if [ "$LATEST" != "null" ]; then
             SHA=$(gh release view "$LATEST" --json targetCommitish -q '.targetCommitish')
-            echo "tagging old release as '${LATEST}-old'"
-            git tag "${LATEST}-old" "$SHA"
-            git push origin "${LATEST}-old"
-
+            gh release create "${LATEST}-old" --target "$SHA" --notes "Old release tag"
             gh release delete "$LATEST" --yes
           fi
 
@@ -58,7 +53,6 @@ jobs:
         run: |
           COMMITS=$(git log --since="12 hours ago" --pretty=format:"- %s (%an)")
           TAG="latest ($(date +%Y%m%d%H%M%S))"
-          
           gh release create "$TAG" tree/main/build/Debug-iphonesimulator/lara.ipa \
             --title "$TAG" \
             --notes "$COMMITS" \
