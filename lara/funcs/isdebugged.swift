@@ -5,7 +5,7 @@
 
 import Darwin
 
-func isDebuggerAttached() -> Bool {
+func isdebugged() -> Bool {
     var info = kinfo_proc()
     var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
     var size = MemoryLayout<kinfo_proc>.stride

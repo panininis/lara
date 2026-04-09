@@ -9,6 +9,7 @@
 #import "respring.h"
 #import "offsets.h"
 #import "utils.h"
+#import "apfs.h"
 #import "vfs.h"
 #import "sbx.h"
 

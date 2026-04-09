@@ -81,6 +81,7 @@ struct lara: App {
                 }
                 
                 init_offsets()
+                offsets_init()
             }
             .onChange(of: scenePhase) { phase in
                 if phase == .background {

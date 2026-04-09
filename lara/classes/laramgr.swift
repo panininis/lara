@@ -391,4 +391,37 @@ final class laramgr: ObservableObject {
             sbx_elevate();
         }
     }
+    
+    func isapfs(_ path: String) -> Bool {
+        var s = statfs()
+        guard path.withCString({ statfs($0, &s) }) == 0 else {
+            return false
+        }
+        
+        let fstypename = s.f_fstypename
+        return withUnsafePointer(to: fstypename) { ptr in
+            ptr.withMemoryRebound(to: CChar.self, capacity: MemoryLayout.size(ofValue: fstypename)) {
+                String(cString: $0) == "apfs"
+            }
+        }
+    }
+    
+    @discardableResult
+    func apfsown(path: String, uid: UInt32, gid: UInt32) -> Bool {
+        if !isapfs(path) {
+            print("\(path) is apfs!")
+        }
+        
+        let result = path.withCString { cPath in
+            apfs_own(cPath, uid_t(uid), gid_t(gid))
+        }
+        
+        if result != 0 {
+            print("failed to chown \(path)")
+            return false
+        }
+        
+        print("changed owner of \(path) to \(uid):\(gid)!")
+        return true
+    }
 }

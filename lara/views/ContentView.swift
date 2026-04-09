@@ -327,6 +327,10 @@ struct ContentView: View {
                                     ZeroView(mgr: mgr)
                                 }
                                 
+                                NavigationLink("3 App Bypass (Broken?)") {
+                                    AppsView(mgr: mgr)
+                                }
+                                
                                 if 1 == 2 {
                                     NavigationLink("Passcode Theme") {
                                         PasscodeView(mgr: mgr)
